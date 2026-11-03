@@ -1,4 +1,4 @@
-
+import os
 import pytest
 
 from fastapi.testclient import TestClient
@@ -10,10 +10,15 @@ from app.main import app
 from app.models import Base
 
 
-TEST_DATABASE_URL = (
-    "postgresql+psycopg://taskuser:taskpassword"
-    "@127.0.0.1:5432/taskdb_test"
+TEST_DATABASE_URL = os.getenv(
+    "TEST_DATABASE_URL",
+    "postgresql+psycopg://taskuser:taskpassword@127.0.0.1:5432/taskdb_test",
 )
+
+if TEST_DATABASE_URL.rsplit("/", 1)[-1] != "taskdb_test":
+    raise RuntimeError(
+        "Tests must use the taskdb_test database"
+    )
 
 test_engine = create_engine(
     TEST_DATABASE_URL,
